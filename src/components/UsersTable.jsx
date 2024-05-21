@@ -11,7 +11,7 @@ function UsersTable() {
             email: '',
             address: '',
             role: '',
-            isVerified: ''
+            status: ''
         }
     );
 
@@ -32,14 +32,14 @@ function UsersTable() {
                 query.role = role;
             }
         }
-        if (filteredUsers.isVerified) {
-            let list = filteredUsers.isVerified.map((item) => item.value);
-            if ((list.includes('verified') && list.includes('not-verified')) || list.includes('all')) {
+        if (filteredUsers.status) {
+            let list = filteredUsers.status.map((item) => item.value);
+            if ((list.includes('active') && list.includes('inactive')) || list.includes('all')) {
                 // do nothing
-            } else if (list.includes('verified')) {
-                query.isVerified = true;
-            } else if (list.includes('not-verified')) {
-                query.isVerified = false;
+            } else if (list.includes('active')) {
+                query.status = 'active';
+            } else if (list.includes('inactive')) {
+                query.status = 'inactive';
             }
         }
         return query;
@@ -48,7 +48,7 @@ function UsersTable() {
     if (users.length === 0) {
         let query = getQuery();
         try {
-            axios.get('user/gets', {params: query})
+            axios.get('/users', {params: query})
                 .then((response) => {
                     if (response.data.length > 0)
                         setUsers(response.data);
@@ -61,7 +61,7 @@ function UsersTable() {
     let filterUsers = () => {
         let query = getQuery();
         try {
-            axios.get('user/gets', {params: query})
+            axios.get('/users', {params: query})
                 .then((response) => {
                     setUsers(response.data);
                 });
@@ -96,7 +96,6 @@ function UsersTable() {
                             value={filteredUsers.role}
                             onChange={(selectedOption) => setFilteredUsers({...filteredUsers, role: selectedOption})}
                             options={[
-                                {value: 'manager', label: 'Manager'},
                                 {value: 'user', label: 'User'},
                                 {value: 'admin', label: 'Admin'},
                                 {value: 'all', label: 'All'}
@@ -107,14 +106,14 @@ function UsersTable() {
                     </div>
                     <div className="form-control flex-1">
                         <Select
-                            value={filteredUsers.isVerified}
+                            value={filteredUsers.status}
                             onChange={(selectedOption) => setFilteredUsers({
                                 ...filteredUsers,
-                                isVerified: selectedOption
+                                status: selectedOption
                             })}
                             options={[
-                                {value: 'verified', label: 'Verified'},
-                                {value: 'not-verified', label: 'Not Verified'},
+                                {value: 'active', label: 'active'},
+                                {value: 'inactive', label: 'inactive'},
                                 {value: 'all', label: 'All'}
                             ]}
                             className="text-left w-full"
@@ -152,14 +151,14 @@ function UsersTable() {
                                 <div className="flex items-center gap-3">
                                     <div className="avatar">
                                         <div className="mask mask-squircle w-12 h-12">
-                                            <img src={'https://picsum.photos/200/300'}
+                                            <img src={user.avatar ? user.avatar : 'https://i.pravatar.cc/300'}
                                                  alt="Avatar Tailwind CSS Component"/>
                                         </div>
                                     </div>
                                     <div>
                                         <div className="font-bold">{user.username}</div>
                                         <div className="text-sm opacity-50">
-                                            {user.isVerified ? 'Verified' : 'Not Verified'}
+                                            {user.status }
                                         </div>
                                     </div>
                                 </div>
@@ -170,11 +169,9 @@ function UsersTable() {
                                 {user.address ? user.address : <strong>N/A</strong>}
                             </td>
                             <td>
-                                {user.adminRole ? 'Admin' : user.managerRole ? 'Manager' : 'User'}
+                                {user.role}
                             </td>
-                            <td>
-                                <button className="btn btn-ghost btn-xs">details</button>
-                            </td>
+
                         </tr>
                     ))}
                     </tbody>
