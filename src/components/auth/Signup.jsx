@@ -2,7 +2,7 @@ import {useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import axios from "axios";
 
-let SignUp = () => {
+const SignUp = () => {
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
@@ -61,11 +61,10 @@ let SignUp = () => {
         if (!validateForm()) {
             return;
         }
-        console.log(formData);
 
         // Send form data to the server
         try {
-            axios.post("auth/register", formData)
+            await axios.post("auth/register", formData)
                 .then((response) => {
                     if (response.status === 201) {
                         alert("Please check your email to verify your account")
@@ -81,7 +80,6 @@ let SignUp = () => {
     };
 
     return (
-        <>
             <section className="bg-gray-50 dark:bg-gray-900 pt-0">
                 <div className="flex flex-col items-center content-center mx-auto ">
                     <Link to={"/"} className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
@@ -203,7 +201,6 @@ let SignUp = () => {
                     </div>
                 </div>
             </section>
-        </>
     );
 };
 

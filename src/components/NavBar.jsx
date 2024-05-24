@@ -49,7 +49,6 @@ function NavBar() {
             book_list: cart.map(item => ({ book_id: item._id, quantity: item.quantity })),
             days: days
         };
-        console.log(borrowData);
 
         try {
             await axios.post('/borrow', borrowData);

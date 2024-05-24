@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import 'tailwindcss/tailwind.css';
 import { useSelector, useDispatch } from 'react-redux';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
-import { logout } from '../redux/slices/userSlice';
-import { clearCart } from '../redux/slices/cartSlice';
+import { logout } from '../../redux/slices/userSlice.jsx';
+import { clearCart } from '../../redux/slices/cartSlice.jsx';
 
 const Profile = () => {
   const user = useSelector((state) => state.user);
-  const cart = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const userId = user._id;
@@ -159,7 +158,7 @@ const Profile = () => {
       current_password: passwordData.current_password,
       new_password: passwordData.new_password
     })
-      .then(response => {
+      .then( () => {
         Swal.fire('Success', 'Password changed successfully', 'success');
         setIsPasswordModalOpen(false);
         setPasswordData({

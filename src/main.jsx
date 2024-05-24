@@ -9,7 +9,7 @@ import {jwtDecode} from 'jwt-decode'; // Corrected import
 import Cookies from 'js-cookie';
 
 // Set default Axios configuration
-axios.defaults.baseURL = '/api/v2';
+axios.defaults.baseURL = '/api/v2/';
 axios.defaults.withCredentials = true;
 
 // Function to refresh access token
@@ -20,10 +20,10 @@ const refreshAccessToken = async () => {
         });
 
         if (response.status === 200) {
-            const { accessToken, refreshToken } = response.data;
+            const { accessToken } = response.data;
             const expirationTime = jwtDecode(accessToken).exp;
 
-            localStorage.setItem('expirationTime', expirationTime);
+            localStorage.setItem('expirationTime', expirationTime.toString());
 
             return accessToken;
         }

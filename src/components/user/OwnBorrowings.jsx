@@ -18,8 +18,7 @@ function OwnBorrowing() {
 
     const handleReturn = (id) => {
         axios.put(`/borrow/${id}`)
-            .then((response) => {
-                console.log('Borrow returned:', response.data);
+            .then(() => {
                 // Update borrowings state after returning
                 setBorrowings(prevBorrowings => prevBorrowings.filter(borrowing => borrowing._id !== id));
             })

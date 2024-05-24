@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 
@@ -23,7 +23,6 @@ const EditBook = () => {
         axios.get(`/books/${bookId}`)
             .then(response => {
                 const book = response.data;
-                console.log(book);
                 setFormData({
                     title: book.title,
                     author: book.author,

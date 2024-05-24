@@ -5,7 +5,7 @@ import {useNavigate} from "react-router-dom";
 import {DeleteOutlined} from '@ant-design/icons';
 import Swal from "sweetalert2";
 
-function UsersTable() {
+async function UsersTable() {
     let [users, setUsers] = useState([]);
     const navigate = useNavigate();
 
@@ -52,7 +52,7 @@ function UsersTable() {
     if (users.length === 0) {
         let query = getQuery();
         try {
-            axios.get('/users', {params: query})
+            await axios.get('/users', {params: query})
                 .then((response) => {
                     if (response.data.length > 0)
                         setUsers(response.data);
@@ -62,10 +62,10 @@ function UsersTable() {
         }
     }
 
-    let filterUsers = () => {
+    let filterUsers = async () => {
         let query = getQuery();
         try {
-            axios.get('/users', {params: query})
+            await axios.get('/users', {params: query})
                 .then((response) => {
                     setUsers(response.data);
                 });
@@ -86,18 +86,18 @@ function UsersTable() {
             confirmButtonColor: '#dc3545',
             cancelButtonColor: '#6c757d',
         }).then((result) => {
-            if (result.isConfirmed) {
-                axios.delete(`/users/${id}`)
-                    .then((response) => {
-                        if (response.status === 200) {
-                            setUsers(users.filter((user) => user._id !== id));
-                        }
-                    })
-                    .catch((error) => {
-                        console.error('Error deleting user:', error);
-                    });
+                if (result.isConfirmed) {
+                    axios.delete(`/users/${id}`)
+                        .then((response) => {
+                            if (response.status === 200) {
+                                setUsers(users.filter((user) => user._id !== id));
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('Error deleting user:', error);
+                        });
+                }
             }
-        }
         )
     }
 
@@ -190,7 +190,7 @@ function UsersTable() {
                                     <div>
                                         <div className="font-bold">{user.username}</div>
                                         <div className="text-sm opacity-50">
-                                            {user.status }
+                                            {user.status}
                                         </div>
                                     </div>
                                 </div>
@@ -204,20 +204,20 @@ function UsersTable() {
                                 {user.role}
                             </td>
                             <td>
-                                        <button
-                                            className="underline hover:text-blue-500"
-                                            onClick={() => viewDetail(user._id)}
-                                        >
-                                            View
-                                        </button>
+                                <button
+                                    className="underline hover:text-blue-500"
+                                    onClick={() => viewDetail(user._id)}
+                                >
+                                    View
+                                </button>
 
-                                    </td>
-                                    <td>
-                                                <button onClick={() => removeUser(user._id)}>
-                                                    <DeleteOutlined />
-                                                </button>
-                                            </td>
-                          
+                            </td>
+                            <td>
+                                <button onClick={() => removeUser(user._id)}>
+                                    <DeleteOutlined/>
+                                </button>
+                            </td>
+
                         </tr>
                     ))}
                     </tbody>

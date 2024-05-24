@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
@@ -21,7 +21,7 @@ const UserDetails = () => {
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    axios.get(`/users/${userId}`)
+    axios.get(`/users/admin/${userId}`)
       .then(response => {
         setUserData(response.data);
         setIsLoading(false);
@@ -42,15 +42,15 @@ const UserDetails = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.put(`/users/${userId}`, userData)
+    axios.put(`/users/${userId}`, { status: userData.status })
       .then(response => {
         setUserData(response.data);
         setIsEditing(false);
-        Swal.fire('Success', 'Profile updated successfully', 'success');
+        Swal.fire('Success', 'Status updated successfully', 'success');
       })
       .catch(error => {
-        console.error('Error updating profile:', error);
-        Swal.fire('Error', 'Failed to update profile', 'error');
+        console.error('Error updating status:', error);
+        Swal.fire('Error', 'Failed to update status', 'error');
       });
   };
 
@@ -73,48 +73,9 @@ const UserDetails = () => {
           <form onSubmit={handleSubmit}>
             <div className="flex flex-wrap -mx-2">
               <div className="w-full sm:w-1/2 px-2 mb-4">
-                <label className="block text-gray-700">Name:</label>
-                <input
-                  name="name"
-                  value={userData.name}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                  required
-                />
-              </div>
-              <div className="w-full sm:w-1/2 px-2 mb-4">
-                <label className="block text-gray-700">Phone:</label>
-                <input
-                  name="phone"
-                  value={userData.phone}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                />
-              </div>
-              <div className="w-full sm:w-1/2 px-2 mb-4">
-                <label className="block text-gray-700">Address:</label>
-                <input
-                  name="address"
-                  value={userData.address}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                />
-              </div>
-              <div className="w-full sm:w-1/2 px-2 mb-4">
-                <label className="block text-gray-700">Role:</label>
-                <select
-                  name="role"
-                  value={userData.role}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                  required
-                >
-                  <option value="admin">Admin</option>
-                  <option value="user">User</option>
-                </select>
-              </div>
-              <div className="w-full sm:w-1/2 px-2 mb-4">
-                <label className="block text-gray-700">Status:</label>
+                <label className="block text-gray-700">
+                  Status:
+                </label>
                 <select
                   name="status"
                   value={userData.status}
@@ -125,29 +86,6 @@ const UserDetails = () => {
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
                   <option value="suspended">Suspended</option>
-                </select>
-              </div>
-              <div className="w-full sm:w-1/2 px-2 mb-4">
-                <label className="block text-gray-700">Date of Birth:</label>
-                <input
-                  name="date_of_birth"
-                  type="date"
-                  value={userData.date_of_birth}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                />
-              </div>
-              <div className="w-full sm:w-1/2 px-2 mb-4">
-                <label className="block text-gray-700">Gender:</label>
-                <select
-                  name="gender"
-                  value={userData.gender}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                >
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
                 </select>
               </div>
             </div>
@@ -191,6 +129,14 @@ const UserDetails = () => {
           </div>
         )}
       </div>
+      {!isEditing && (
+        <button
+          onClick={() => setIsEditing(true)}
+          className="w-full px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+        >
+          Edit Status
+        </button>
+      )}
     </div>
   );
 };

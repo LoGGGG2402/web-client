@@ -25,7 +25,6 @@ function BorrowsTable() {
         const query = getQuery();
         axios.get('/borrow/admin/all', { params: query })
             .then(response => {
-                console.log(response.data); 
                 if (response.data) {
                     setBorrowings(response.data);
                 }
