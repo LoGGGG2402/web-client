@@ -41,7 +41,11 @@ const BooksTable = () => {
                         setBooks(response.data);
                 });
         } catch (error) {
-            console.error(error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong! error: ' + error,
+            }).then()
         }
     }
 
@@ -53,7 +57,11 @@ const BooksTable = () => {
                         setBooks(response.data);
                 })
                 .catch((error) => {
-                    console.error(error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Something went wrong! error: ' + error,
+                    }).then()
                 })
             }
 
@@ -108,7 +116,11 @@ const BooksTable = () => {
                         }
                     })
                     .catch((error) => {
-                        console.error('Error deleting book:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Something went wrong! error: ' + error,
+                        }).then()
                     });
             }
         });

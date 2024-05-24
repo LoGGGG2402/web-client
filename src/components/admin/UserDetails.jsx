@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import {useEffect, useRef, useState} from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 import ReCAPTCHA from 'react-google-recaptcha';
 import Swal from 'sweetalert2';
 
@@ -8,7 +8,6 @@ const UserDetails = () => {
   const { userId } = useParams(); // Assumes you're using react-router-dom for route parameters
   const recaptchaRef = useRef(null);
   const [isVerified, setIsVerified] = useState(false);
-  const [isRecaptchaError, setIsRecaptchaError] = useState(false);
   const [formData, setFormData] = useState({
     role: '',
     status: '',
@@ -36,7 +35,11 @@ const UserDetails = () => {
         setIsLoading(false);
       })
       .catch(error => {
-        console.error('Error fetching user data:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Something went wrong! error: ' + error,
+        }).then()
         setIsLoading(false);
       });
   }, [userId]);
@@ -53,28 +56,27 @@ const UserDetails = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isVerified) {
-      setIsRecaptchaError(true);
       recaptchaRef.current.reset();
       return;
-    } 
+    }
 
-    axios.put(`/users/admin/${userId}`, formData)
-      .then(response => {
-        setUserData(response.data);
-        setIsEditing(false);
-        setIsVerified(false);
-        setIsRecaptchaError(false);
-        Swal.fire('Success', 'Status and role updated successfully', 'success');
-      })
-      .catch(error => {
-        setIsVerified(false);
-        setIsRecaptchaError(false);
-        console.error('Error updating status and role:', error);
-        Swal.fire('Error', 'Failed to update status and role', 'error');
-      });
+    try {
+      const response = await axios.put(`/users/admin/${userId}`, formData);
+      setUserData(response.data);
+      setIsEditing(false);
+      setIsVerified(false);
+      Swal.fire('Success', 'Status and role updated successfully', 'success').then()
+    } catch (error) {
+      setIsVerified(false);
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong! error: ' + error,
+      }).then()
+    }
   };
 
   const handleRecaptchaChange = (value) => {
@@ -82,8 +84,7 @@ const UserDetails = () => {
       ...formData,
       recaptcha: value
     });
-    setIsVerified(value);
-    setIsRecaptchaError(!value);
+    setIsVerified(!!value);
   };
 
   if (isLoading) return <div>Loading...</div>;
@@ -105,8 +106,9 @@ const UserDetails = () => {
           <form onSubmit={handleSubmit}>
             <div className="flex flex-wrap -mx-2">
               <div className="w-full sm:w-1/2 px-2 mb-4">
-                <label className="block text-gray-700">Status:</label>
+                <label className="block text-gray-700" htmlFor="status">Status:</label>
                 <select
+                    id="status"
                   name="status"
                   value={userData.status}
                   onChange={handleChange}
@@ -118,8 +120,9 @@ const UserDetails = () => {
                 </select>
               </div>
               <div className="w-full sm:w-1/2 px-2 mb-4">
-                <label className="block text-gray-700">Role:</label>
+                <label className="block text-gray-700" htmlFor="role">Role:</label>
                 <select
+                    id="role"
                   name="role"
                   value={userData.role}
                   onChange={handleChange}
@@ -138,17 +141,21 @@ const UserDetails = () => {
               onChange={handleRecaptchaChange}
             />
             {!isVerified && (
-              <p className="text-red-500">Please verify you are human</p>
+                <>
+                  <p className="text-red-500">Please verify you are human</p>
+                  <button
+                      type="submit"
+                      className="w-full px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+                  >
+                    Save Changes
+                  </button>
+                </>
+
             )}
-            <button
-              type="submit"
-              className="w-full px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
-            >
-              Save Changes
-            </button>
+
           </form>
         ) : (
-          <div className="flex flex-wrap -mx-2">
+            <div className="flex flex-wrap -mx-2">
             <div className="w-full sm:w-1/2 px-2 mb-4">
               <label className="block text-gray-700">Name:</label>
               <p className="px-3 py-2 border rounded-md">{userData.name ? userData.name : 'Not specified'}</p>

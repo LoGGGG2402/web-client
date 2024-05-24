@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
+import Swal from "sweetalert2";
 
 const EditBook = () => {
     const { bookId } = useParams();
@@ -32,13 +33,21 @@ const EditBook = () => {
                     language: book.language,
                     isbn: book.isbn,
                     quantity: book.quantity,
-                    categories: book.categories_name, 
-          
+                    categories: book.categories_name,
                 });
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Book data fetched successfully',
+                }).then()
                 setLoading(false);
             })
             .catch(error => {
-                console.error('Error fetching book data:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong! error: ' + error,
+                }).then()
                 setLoading(false);
             });
     }, [bookId]);
@@ -55,15 +64,21 @@ const EditBook = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
- 
         try {
             await axios.put(`/books/${bookId}`, formData);
-            alert('Book updated successfully!');
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: 'Book updated successfully',
+            }).then()
+
             navigate('/');
         } catch (error) {
-            console.error('Error updating book:', error);
-            alert('Error updating book. Please try again.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong! error: ' + error,
+            }).then()
         }
     };
 

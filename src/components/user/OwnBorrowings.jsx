@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 function OwnBorrowing() {
     const [borrowings, setBorrowings] = useState([]);
@@ -12,7 +13,11 @@ function OwnBorrowing() {
                 }
             })
             .catch((error) => {
-                console.error('Error fetching borrowings:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong! error: ' + error,
+                }).then()
             });
     }, []);
 
@@ -23,7 +28,11 @@ function OwnBorrowing() {
                 setBorrowings(prevBorrowings => prevBorrowings.filter(borrowing => borrowing._id !== id));
             })
             .catch((error) => {
-                console.error('Error returning borrow:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong! error: ' + error,
+                }).then()
             });
     };
 

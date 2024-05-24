@@ -1,13 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 function BorrowsTable() {
     const [borrowings, setBorrowings] = useState([]);
     const [filteredBorrowings, setFilteredBorrowings] = useState({});
     
-    useEffect(() => {
-        filterBorrowings();
-    }, [filteredBorrowings]);
+
 
     const getQuery = () => {
         let query = {};
@@ -17,11 +16,10 @@ function BorrowsTable() {
         if (filteredBorrowings.status) {
             query.status = filteredBorrowings.status;
         }
-        // Add more conditions for other filters as needed
         return query;
     }
 
-    const filterBorrowings = () => {
+    const queryBorrowings = async () => {
         const query = getQuery();
         axios.get('/borrow/admin/all', { params: query })
             .then(response => {
@@ -30,9 +28,15 @@ function BorrowsTable() {
                 }
             })
             .catch(error => {
-                console.error('Error filtering borrowings:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong! error: ' + error,
+                }).then()
             });
     }
+
+    queryBorrowings().then()
 
     return (
         <>
@@ -50,7 +54,7 @@ function BorrowsTable() {
                 </div>
                 {/* Add more filter inputs as needed */}
                 <div className="form-control">
-                    <button className="btn btn-primary" onClick={filterBorrowings}>
+                    <button className="btn btn-primary" onClick={queryBorrowings}>
                         Filter
                     </button>
                 </div>

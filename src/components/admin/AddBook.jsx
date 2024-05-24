@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import Swal from "sweetalert2";
 
 const AddBookForm = () => {
     const [formData, setFormData] = useState({
@@ -64,10 +65,17 @@ const AddBookForm = () => {
                 categories: '',
                 coverImage: null
             });
-            alert('Book added successfully!');
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: 'Book added successfully'
+            }).then();
         } catch (error) {
-            console.error('Error adding book:', error);
-            alert('Error adding book. Please try again.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong! error: ' + error
+            }).then();
         }
     };
 

@@ -1,8 +1,8 @@
-import { useState } from "react";
+import {useState} from "react";
 import Select from 'react-select';
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { DeleteOutlined } from '@ant-design/icons';
+import {useNavigate} from "react-router-dom";
+import {DeleteOutlined} from '@ant-design/icons';
 import Swal from "sweetalert2";
 import ReCAPTCHA from "react-google-recaptcha";
 
@@ -59,33 +59,39 @@ function UsersTable() {
 
     if (users.length === 0) {
         let query = getQuery();
-        try {
-            axios.get('/users', { params: query })
-                .then((response) => {
+        axios.get('/users', {params: query})
+            .then((response) => {
                     if (response.data.length > 0)
                         setUsers(response.data);
-                });
-        } catch (error) {
-            console.error(error);
-        }
+                })
+            .catch((error) => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong! error: ' + error,
+                }).then()
+            })
     }
 
     let filterUsers = () => {
         let query = getQuery();
-        try {
             axios.get('/users', { params: query })
                 .then((response) => {
                     setUsers(response.data);
-                });
-        } catch (error) {
-            console.error(error);
-        }
+                })
+                .catch((error) => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Something went wrong! error: ' + error,
+                    }).then()
+                })
     }
     const viewDetail = (id) => {
         navigate(`/admin/users/${id}`)
     }
     const removeUser = (id) => {
-        formData.userId = id;
+        setFormData({...formData, userId: id})
         setShowModal(true);
     }
     const handleRecaptchaChange = (token) => {
@@ -94,8 +100,9 @@ function UsersTable() {
     }
     const onClickRemove = () => {
         if (isVerified) {
-            axios.delete(`/users/admin/${formData.userId}`, formData)
+            axios.delete(`/users/admin/${formData.userId}`, {data: formData})
                 .then((response) => {
+                    console.log(response);
                     Swal.fire({
                         icon: 'success',
                         title: 'User removed'
@@ -104,13 +111,19 @@ function UsersTable() {
                     window.location.reload();
                     });
                 })
-            
+                .catch((error) => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Something went wrong! error: ' + error,
+                    }).then()
+                })
         }
         else {
             Swal.fire({
                 icon: 'error',
                 title: 'Please verify captcha'
-            });
+            }).then()
         }
     }
 

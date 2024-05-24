@@ -39,7 +39,11 @@ const Profile = () => {
         setIsLoading(false);
       })
       .catch(error => {
-        console.error('Error fetching user data:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Something went wrong! error: ' + error,
+        }).then()
         setIsLoading(false);
       });
   }, [userId]);
@@ -59,7 +63,12 @@ const Profile = () => {
         setFormData(response.data);
         alert('Profile updated successfully');
       })
-      .catch(error => console.error('Error updating profile:', error));
+      .catch(error =>
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Something went wrong! error: ' + error,
+          }).then());
   };
   const handleDeleteAccount = () => {
     Swal.fire({
@@ -129,7 +138,6 @@ const Profile = () => {
       }
     })
     .then(response => {
-    
       Swal.fire('Success', 'Avatar uploaded successfully', 'success').then(() => {
         setFormData({
           ...formData,
@@ -137,13 +145,13 @@ const Profile = () => {
         });
       }
       );
-
     })
     .catch(error => {
-    
-      console.error('Error uploading avatar:', error);
-     
-      Swal.fire('Error', 'Failed to upload avatar', 'error');
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong! error: ' + error,
+      }).then()
     });
   };
 
@@ -159,7 +167,7 @@ const Profile = () => {
       new_password: passwordData.new_password
     })
       .then( () => {
-        Swal.fire('Success', 'Password changed successfully', 'success');
+        Swal.fire('Success', 'Password changed successfully', 'success').then();
         setIsPasswordModalOpen(false);
         setPasswordData({
           current_password: '',
@@ -168,8 +176,11 @@ const Profile = () => {
         });
       })
       .catch(error => {
-        console.error('Error changing password:', error);
-        Swal.fire('Error', 'Failed to change password', 'error');
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Something went wrong! error: ' + error,
+        }).then()
       });
   };
 

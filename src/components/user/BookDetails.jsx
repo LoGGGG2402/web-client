@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
+import Swal from "sweetalert2";
 
 const BookDetails = () => {
     const { bookId } = useParams();
@@ -18,7 +19,11 @@ const BookDetails = () => {
                 setBook(response.data);
                 setIsLoading(false);
             } catch (error) {
-                console.error('Error fetching book details:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong! error: ' + error,
+                }).then()
                 setIsLoading(false);
             }
         };
@@ -28,7 +33,11 @@ const BookDetails = () => {
                 const response = await axios.get(`/books/${bookId}/reviews`);
                 setReviews(response.data);
             } catch (error) {
-                console.error('Error fetching book reviews:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong! error: ' + error,
+                }).then()
             }
         };
 
@@ -50,7 +59,11 @@ const BookDetails = () => {
             setReviews([...reviews, response.data]);
             setNewReview({ text: '', rating: 1, username: user.username });
         } catch (error) {
-            console.error('Error adding review:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong! error: ' + error,
+            }).then()
         }
     };
     

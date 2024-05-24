@@ -1,6 +1,7 @@
 import {useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const SignUp = () => {
     const navigate = useNavigate();
@@ -75,7 +76,11 @@ const SignUp = () => {
                     setErrorMessage(message.message);
                 });
         } catch (error) {
-            console.error("Error:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong! error: ' + error,
+            }).then()
         }
     };
 

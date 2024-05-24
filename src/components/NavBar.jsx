@@ -3,6 +3,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {logout} from "../redux/slices/userSlice";
 import {clearCart, removeBook} from "../redux/slices/cartSlice.jsx";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 
 function NavBar() {
@@ -20,10 +21,12 @@ function NavBar() {
                     dispatch(clearCart());
                     navigate('/login');
                 });
-
-
         } catch (error) {
-            console.error(error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong! error: ' + error,
+            }).then()
         }
     }
 
@@ -53,10 +56,17 @@ function NavBar() {
         try {
             await axios.post('/borrow', borrowData);
             dispatch(clearCart());
-            alert('Books borrowed successfully!');
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: 'Books borrowed successfully!',
+            }).then();
         } catch (error) {
-            console.error('Error borrowing books:', error);
-            alert('Error borrowing books. Please try again.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong! error: ' + error,
+            }).then()
         }
     }
 
