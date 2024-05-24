@@ -4,6 +4,7 @@ import axios from "axios";
 import { login } from "../redux/slices/userSlice.jsx";
 import { useDispatch } from "react-redux";
 import ReCAPTCHA from "react-google-recaptcha";
+import Swal from "sweetalert2";
 
 const Login = () => {
     let navigate = useNavigate();
@@ -56,7 +57,7 @@ const Login = () => {
             return;
         }
 
-        if (numberOfLoginAttempts >= 5 && !isVerified) {
+        if (numberOfLoginAttempts >= 3 && !isVerified) {
             setIsRecaptchaError(true); // Set reCAPTCHA error state
             return;
         }
@@ -67,11 +68,36 @@ const Login = () => {
                 dispatch(login(response.data));
                 navigate("/");
             }
+            
         } catch (error) {
             setNumberOfLoginAttempts(numberOfLoginAttempts + 1);
             if (numberOfLoginAttempts + 1 >= 5) {
                 setIsVerified(false); // Reset the reCAPTCHA verification status
                 recaptchaRef.current.reset(); // Reset the reCAPTCHA widget
+            }
+            if (error.response.status === 403) {
+                Swal.fire({
+                    title: "Account is not activated",
+                    text: "Do you want to send activation email?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes",
+                    cancelButtonText: "No"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        axios.post("auth/activate-account", { email: formData.email }, { withCredentials: true });
+                        Swal.fire(
+                            "Email sent",
+                            "Please check your email for activation link",
+                            "success"
+                        ).then(() => {
+                            window.location.reload();
+                        });
+                    }
+                });
+
             }
             console.error("Error:", error);
             setErrorMessage(error.response.data.message);
@@ -146,7 +172,7 @@ const Login = () => {
                                 </div>
                                 {errors.termsAccepted && <span className="text-red-500">{errors.termsAccepted}</span>}
                             </div>
-                            {numberOfLoginAttempts >= 5 && (
+                            {numberOfLoginAttempts >= 3 && (
                                 <ReCAPTCHA
                                     ref={recaptchaRef}
                                     className="mt-3"
@@ -155,7 +181,7 @@ const Login = () => {
                                 />
                             )}
                             {isRecaptchaError && (
-                                <p className="text-red-500">Please complete the reCAPTCHA</p>
+                                <p className="text-red-500">Please verify you are human</p>
                             )}
                             {errorMessage && <p className="text-red-500">{errorMessage}</p>}
                             <button type="submit"
@@ -169,7 +195,7 @@ const Login = () => {
                                 </Link>
                             </p>
                             <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                                {"Don't have an account yet?"}
+                                Don't have an account yet?{" "}
                                 <Link to="/signup" className="font-medium text-primary-600 hover:underline dark:text-primary-500">
                                     Sign up
                                 </Link>

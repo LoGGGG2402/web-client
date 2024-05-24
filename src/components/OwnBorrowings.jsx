@@ -37,6 +37,7 @@ function OwnBorrowing() {
                         <th>Status</th>
                         <th>Borrow Date</th>
                         <th>Return Date</th>
+                        <th>Actual return date </th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -47,6 +48,7 @@ function OwnBorrowing() {
                             <td>{borrowing.status}</td>
                             <td>{new Date(borrowing.borrow_date).toLocaleDateString()}</td>
                             <td>{new Date(borrowing.return_date).toLocaleDateString()}</td>
+                            <td>{borrowing.actual_return_date ? new Date(borrowing.actual_return_date).toLocaleDateString() : ''}</td>
                             <td>
                                 {borrowing.status !== 'returned' && (
                                     <button className="btn btn-primary" onClick={() => handleReturn(borrowing._id)}>

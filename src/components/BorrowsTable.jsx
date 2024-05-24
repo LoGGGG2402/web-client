@@ -65,6 +65,7 @@ function BorrowsTable() {
                         <th>Status</th>
                         <th>Borrow Date</th>
                         <th>Return Date</th>
+                        <th>Actual Return Date</th>
                         {/* Add more table headers for other borrow details */}
                     </tr>
                     </thead>
@@ -76,6 +77,7 @@ function BorrowsTable() {
                             <td>{borrowing.status}</td>
                             <td>{new Date(borrowing.borrow_date).toLocaleDateString()}</td>
                             <td>{new Date(borrowing.return_date).toLocaleDateString()}</td>
+                            <td>{borrowing.actual_return_date ? new Date(borrowing.actual_return_date).toLocaleDateString() : ''}</td>
                             {/* Add more table cells for other borrow details */}
                         </tr>
                     ))}

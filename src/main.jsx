@@ -7,12 +7,7 @@ import store from './redux/store';
 import { Provider } from 'react-redux';
 import {jwtDecode} from 'jwt-decode'; // Corrected import
 import Cookies from 'js-cookie';
-// set another axios instance for cloudinary
-const cloudinaryAxios = axios.create({
-    baseURL: 'https://api.cloudinary.com/v1_1/dnmsfjbqj',
-});
-export default cloudinaryAxios;
-// How to use cloudinaryAxios
+
 // Set default Axios configuration
 axios.defaults.baseURL = '/api/v2';
 axios.defaults.withCredentials = true;
@@ -29,8 +24,6 @@ const refreshAccessToken = async () => {
             const expirationTime = jwtDecode(accessToken).exp;
 
             localStorage.setItem('expirationTime', expirationTime);
-            Cookies.set('accessToken', accessToken);
-            Cookies.set('refreshToken', refreshToken);
 
             return accessToken;
         }
@@ -45,12 +38,18 @@ axios.interceptors.request.use(
         let accessToken = Cookies.get('accessToken');
         const expirationTime = localStorage.getItem('expirationTime');
 
-        if (expirationTime && Date.now() >= expirationTime * 1000-2*60*1000) {
+        if (expirationTime && Date.now() >= expirationTime * 1000) {
             accessToken = await refreshAccessToken();
         }
 
         if (accessToken) {
             config.headers['Authorization'] = `Bearer ${accessToken}`;
+        }
+
+        //for CSRF token
+        const csrfToken = Cookies.get('csrfToken');
+        if (csrfToken) {
+            config.headers['csrf-token'] = csrfToken;
         }
 
         return config;
@@ -72,6 +71,7 @@ axios.interceptors.response.use(
             const newAccessToken = await refreshAccessToken();
             if (newAccessToken) {
                 axios.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
+                axios.defaults.headers.common['csrf-token'] = Cookies.get('csrfToken');
                 return axios(originalRequest);
             }
         }
@@ -82,7 +82,7 @@ axios.interceptors.response.use(
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
         <Provider store={store}>
-            <App/>
+            <App />
         </Provider>
     </React.StrictMode>,
-)
+);
