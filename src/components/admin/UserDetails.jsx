@@ -11,8 +11,8 @@ const UserDetails = () => {
     email: '',
     phone: '',
     address: '',
-    role: '',
-    status: '',
+    role: 'user', // Default role to 'user'
+    status: 'active', // Default status to 'active'
     avatar: '',
     date_of_birth: '',
     gender: ''
@@ -42,15 +42,15 @@ const UserDetails = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.put(`/users/admin/${userId}`, { status: userData.status })
+    axios.put(`/users/admin/${userId}`, { status: userData.status, role: userData.role })
       .then(response => {
         setUserData(response.data);
         setIsEditing(false);
-        Swal.fire('Success', 'Status updated successfully', 'success');
+        Swal.fire('Success', 'Status and role updated successfully', 'success');
       })
       .catch(error => {
-        console.error('Error updating status:', error);
-        Swal.fire('Error', 'Failed to update status', 'error');
+        console.error('Error updating status and role:', error);
+        Swal.fire('Error', 'Failed to update status and role', 'error');
       });
   };
 
@@ -73,9 +73,7 @@ const UserDetails = () => {
           <form onSubmit={handleSubmit}>
             <div className="flex flex-wrap -mx-2">
               <div className="w-full sm:w-1/2 px-2 mb-4">
-                <label className="block text-gray-700">
-                  Status:
-                </label>
+                <label className="block text-gray-700">Status:</label>
                 <select
                   name="status"
                   value={userData.status}
@@ -86,6 +84,19 @@ const UserDetails = () => {
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
                   <option value="suspended">Suspended</option>
+                </select>
+              </div>
+              <div className="w-full sm:w-1/2 px-2 mb-4">
+                <label className="block text-gray-700">Role:</label>
+                <select
+                  name="role"
+                  value={userData.role}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                  required
+                >
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
                 </select>
               </div>
             </div>
@@ -100,15 +111,15 @@ const UserDetails = () => {
           <div className="flex flex-wrap -mx-2">
             <div className="w-full sm:w-1/2 px-2 mb-4">
               <label className="block text-gray-700">Name:</label>
-              <p className="px-3 py-2 border rounded-md">{userData.name}</p>
+              <p className="px-3 py-2 border rounded-md">{userData.name ? userData.name : 'Not specified'}</p>
             </div>
             <div className="w-full sm:w-1/2 px-2 mb-4">
               <label className="block text-gray-700">Phone:</label>
-              <p className="px-3 py-2 border rounded-md">{userData.phone}</p>
+              <p className="px-3 py-2 border rounded-md">{userData.phone ? userData.phone : 'Not specified'}</p>
             </div>
             <div className="w-full sm:w-1/2 px-2 mb-4">
               <label className="block text-gray-700">Address:</label>
-              <p className="px-3 py-2 border rounded-md">{userData.address}</p>
+              <p className="px-3 py-2 border rounded-md">{userData.address ? userData.address : 'Not specified'}</p>
             </div>
             <div className="w-full sm:w-1/2 px-2 mb-4">
               <label className="block text-gray-700">Role:</label>
@@ -120,11 +131,11 @@ const UserDetails = () => {
             </div>
             <div className="w-full sm:w-1/2 px-2 mb-4">
               <label className="block text-gray-700">Date of Birth:</label>
-              <p className="px-3 py-2 border rounded-md">{new Date(userData.date_of_birth).toLocaleDateString()}</p>
+              <p className="px-3 py-2 border rounded-md">{userData.date_of_birth ? userData.date_of_birth : 'Not specified'}</p>
             </div>
             <div className="w-full sm:w-1/2 px-2 mb-4">
               <label className="block text-gray-700">Gender:</label>
-              <p className="px-3 py-2 border rounded-md">{userData.gender}</p>
+              <p className="px-3 py-2 border rounded-md">{userData.gender ? userData.gender : 'Not specified'}</p>
             </div>
           </div>
         )}
@@ -134,7 +145,7 @@ const UserDetails = () => {
           onClick={() => setIsEditing(true)}
           className="w-full px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
         >
-          Edit Status
+          Edit Status and Role
         </button>
       )}
     </div>
