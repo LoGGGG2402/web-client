@@ -42,7 +42,7 @@ const UserDetails = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.put(`/users/${userId}`, { status: userData.status })
+    axios.put(`/users/admin/${userId}`, { status: userData.status })
       .then(response => {
         setUserData(response.data);
         setIsEditing(false);

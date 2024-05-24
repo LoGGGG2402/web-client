@@ -5,7 +5,7 @@ import {useNavigate} from "react-router-dom";
 import {DeleteOutlined} from '@ant-design/icons';
 import Swal from "sweetalert2";
 
-async function UsersTable() {
+function UsersTable() {
     let [users, setUsers] = useState([]);
     const navigate = useNavigate();
 
@@ -52,7 +52,7 @@ async function UsersTable() {
     if (users.length === 0) {
         let query = getQuery();
         try {
-            await axios.get('/users', {params: query})
+            axios.get('/users', {params: query})
                 .then((response) => {
                     if (response.data.length > 0)
                         setUsers(response.data);
