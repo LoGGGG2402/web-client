@@ -140,7 +140,7 @@ const UserDetails = () => {
               sitekey="6Ldl-tspAAAAAMFgU-aOT5gkzMZIr0LfFXzgASzK"
               onChange={handleRecaptchaChange}
             />
-            {!isVerified && (
+            {isVerified && (
                 <>
                   <p className="text-red-500">Please verify you are human</p>
                   <button
@@ -150,7 +150,6 @@ const UserDetails = () => {
                     Save Changes
                   </button>
                 </>
-
             )}
 
           </form>
