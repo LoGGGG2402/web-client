@@ -61,6 +61,9 @@ const Login = () => {
             const response = await axios.post("auth/login", formData, { withCredentials: true });
             if (response.status === 200) {
                 dispatch(login(response.data));
+
+                let expirationTime = Date.now() + 15 * 60 * 1000;
+                localStorage.setItem("expirationTime", expirationTime.toString());
                 navigate("/");
             }
         } catch (error) {

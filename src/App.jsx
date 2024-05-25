@@ -6,13 +6,13 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./components/auth/Login.jsx";
 import Signup from "./components/auth/Signup.jsx";
 import AddBookForm from "./components/admin/AddBook.jsx";
-import FinalRegister from './components/auth/FinalRegister.jsx';
+import VerifyResult from './components/auth/VerifyResult.jsx';
 import ResetPassword from './components/auth/ResetPassword.jsx';
 import ForgotPassword from './components/auth/ForgotPassword.jsx';
 import Profile from './components/user/Profile.jsx';
 import BorrowsTable from './components/admin/BorrowsTable.jsx';
 import OwnBorrowings from './components/user/OwnBorrowings.jsx';
-import { useSelector } from 'react-redux';
+import {useSelector} from 'react-redux';
 import BookDetails from './components/user/BookDetails.jsx';
 import EditBook from './components/admin/EditBook.jsx';
 import UserDetails from './components/admin/UserDetails.jsx';
@@ -27,7 +27,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/books/:bookId" element={<BookDetails />} />
-                <Route path="/final-register/:status" element={<FinalRegister />} />
+                <Route path="/verify-result/:status/:message" element={<VerifyResult />} />
                 <Route path="/reset-password/:token" element={<ResetPassword />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 {user && (
