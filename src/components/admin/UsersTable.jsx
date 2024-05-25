@@ -259,7 +259,6 @@ function UsersTable() {
                             <h2 className="text-2xl font-bold mb-4">Verify Captcha</h2>
                             {/* Hiển thị reCAPTCHA trong modal */}
                             <ReCAPTCHA
-
                                 className="mt-3"
                                 sitekey="6Ldl-tspAAAAAMFgU-aOT5gkzMZIr0LfFXzgASzK"
                                 onChange={handleRecaptchaChange}

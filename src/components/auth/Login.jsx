@@ -18,7 +18,6 @@ const Login = () => {
     const [errors, setErrors] = useState({});
     const [errorMessage, setErrorMessage] = useState("");
     const [numberOfLoginAttempts, setNumberOfLoginAttempts] = useState(0);
-    const [isVerified, setIsVerified] = useState(false);
     const [isRecaptchaError, setIsRecaptchaError] = useState(false);
 
     const validateForm = () => {
@@ -40,8 +39,7 @@ const Login = () => {
     };
 
     const handleRecaptchaChange = (value) => {
-        formData.recaptcha = value;
-        setIsVerified(!!value);
+        setFormData({...formData, recaptcha: value})
         setIsRecaptchaError(false);
     };
 
@@ -52,7 +50,7 @@ const Login = () => {
             return;
         }
 
-        if (numberOfLoginAttempts >= 3 && !isVerified) {
+        if (numberOfLoginAttempts >= 5) {
             setIsRecaptchaError(true);
             return;
         }
@@ -61,15 +59,17 @@ const Login = () => {
             const response = await axios.post("auth/login", formData, { withCredentials: true });
             if (response.status === 200) {
                 dispatch(login(response.data));
-
                 let expirationTime = Date.now() + 15 * 60 * 1000;
                 localStorage.setItem("expirationTime", expirationTime.toString());
                 navigate("/");
             }
         } catch (error) {
-            setNumberOfLoginAttempts(numberOfLoginAttempts + 1);
-            if (numberOfLoginAttempts + 1 >= 3) {
-                setIsVerified(false);
+            if (error.response.data.attempts) {
+                setNumberOfLoginAttempts(parseInt(error.response.data.attempts));
+            } else {
+                setNumberOfLoginAttempts(numberOfLoginAttempts + 1);
+            }
+            if (numberOfLoginAttempts + 1 >= 5) {
                 recaptchaRef.current.reset();
             }
             if (error.response.status === 403) {
