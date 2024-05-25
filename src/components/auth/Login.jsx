@@ -65,7 +65,7 @@ const Login = () => {
             }
         } catch (error) {
             setNumberOfLoginAttempts(numberOfLoginAttempts + 1);
-            if (numberOfLoginAttempts + 1 >= 5) {
+            if (numberOfLoginAttempts + 1 >= 3) {
                 setIsVerified(false);
                 recaptchaRef.current.reset();
             }
