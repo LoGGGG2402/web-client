@@ -9,7 +9,7 @@ import { Provider } from 'react-redux';
 import Cookies from 'js-cookie';
 
 // Set default Axios configuration
-axios.defaults.baseURL = '/api/v2/';
+axios.defaults.baseURL = 'https://libapp-22c8e613e2c2.herokuapp.com/api/v2/';
 // axios.defaults.withCredentials = true;
 
 // Function to refresh access token
@@ -21,9 +21,9 @@ const refreshAccessToken = async () => {
         await axios.post('/auth/refresh-token')
 
         // set new expiration time in date now + 15 minutes
-        const expirationTime = Date.now() + 15 * 60 * 1000;
+        // const expirationTime = Date.now() + 15 * 60 * 1000;
         // console.log(expirationTime)
-        localStorage.setItem('expirationTime', expirationTime.toString());
+        // localStorage.setItem('expirationTime', expirationTime.toString());
         // if (response.status === 200) {
         //     const { accessToken } = response.data;
         //     const expirationTime = jwtDecode(accessToken).exp;
@@ -42,13 +42,19 @@ const refreshAccessToken = async () => {
 axios.interceptors.request.use(
     async (config) => {
         // let accessToken = Cookies.get('accessToken');
-        const expirationTime = parseInt(localStorage.getItem('expirationTime'));
-        // convert to number
+        // const expirationTime = parseInt(localStorage.getItem('expirationTime'));
+        // // convert to number
+        // console.log(expirationTime)
+        // console.log(Date.now())
+        //
+        // if (expirationTime && Date.now() >= expirationTime) {
+        //     await refreshAccessToken();
+        // }
 
 
-        if (expirationTime && Date.now() >= expirationTime) {
-            await refreshAccessToken();
-        }
+        // if (expirationTime && Date.now() >= expirationTime * 1000) {
+        //     await refreshAccessToken();
+        // }
 
         // if (accessToken) {
         //     config.headers['Authorization'] = `Bearer ${accessToken}`;
@@ -59,7 +65,6 @@ axios.interceptors.request.use(
         if (csrfToken) {
             config.headers['csrf-token'] = csrfToken;
         }
-
         return config;
     },
     (error) => {

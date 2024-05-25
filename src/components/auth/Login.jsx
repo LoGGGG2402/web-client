@@ -12,14 +12,13 @@ const Login = () => {
     const [formData, setFormData] = useState({
         email: "",
         password: "",
-        rememberMe: false
+        remember: true
     });
     const recaptchaRef = useRef(null);
     const [errors, setErrors] = useState({});
     const [errorMessage, setErrorMessage] = useState("");
     const [numberOfLoginAttempts, setNumberOfLoginAttempts] = useState(0);
-    const [isVerified, setIsVerified] = useState(false);
-    const [isRecaptchaError, setIsRecaptchaError] = useState(false); // New state for reCAPTCHA error
+    const [isRecaptchaError, setIsRecaptchaError] = useState(false);
 
     const validateForm = () => {
         let errors = {};
@@ -34,14 +33,14 @@ const Login = () => {
             errors.password = "Password is required";
             isValid = false;
         }
+
         setErrors(errors);
         return isValid;
     };
 
     const handleRecaptchaChange = (value) => {
-        formData.recaptcha = value;
-        setIsVerified(!!value);
-        setIsRecaptchaError(false); // Reset reCAPTCHA error state when reCAPTCHA is successfully verified
+        setFormData({...formData, recaptcha: value})
+        setIsRecaptchaError(false);
     };
 
     const handleSubmit = async (e) => {
@@ -51,8 +50,8 @@ const Login = () => {
             return;
         }
 
-        if (numberOfLoginAttempts >= 3 && !isVerified) {
-            setIsRecaptchaError(true); // Set reCAPTCHA error state
+        if (numberOfLoginAttempts >= 5) {
+            setIsRecaptchaError(true);
             return;
         }
 
@@ -60,13 +59,41 @@ const Login = () => {
             const response = await axios.post("auth/login", formData, { withCredentials: true });
             if (response.status === 200) {
                 dispatch(login(response.data));
+                // let expirationTime = Date.now() + 15 * 60 * 1000;
+                // localStorage.setItem("expirationTime", expirationTime.toString());
                 navigate("/");
             }
         } catch (error) {
-            setNumberOfLoginAttempts(numberOfLoginAttempts + 1);
-            if (numberOfLoginAttempts + 1 >= 3) {
-                setIsVerified(false); // Reset the reCAPTCHA verification status
-                recaptchaRef.current.reset(); // Reset the reCAPTCHA widget
+            if (error.response.data.attempts) {
+                setNumberOfLoginAttempts(parseInt(error.response.data.attempts));
+            } else {
+                setNumberOfLoginAttempts(numberOfLoginAttempts + 1);
+            }
+            if (numberOfLoginAttempts + 1 >= 5) {
+                recaptchaRef.current.reset();
+            }
+            if (error.response.status === 403) {
+                Swal.fire({
+                    title: "Account is not activated",
+                    text: "Do you want to send activation email?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes",
+                    cancelButtonText: "No"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        axios.post("auth/activate-account", { email: formData.email }, { withCredentials: true });
+                        Swal.fire(
+                            "Email sent",
+                            "Please check your email for activation link",
+                            "success"
+                        ).then(() => {
+                            window.location.reload();
+                        });
+                    }
+                });
             }
             console.error("Error:", error);
             setErrorMessage(error.response.data.message);
@@ -78,7 +105,7 @@ const Login = () => {
             <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-0">
                 <Link to="/"
                       className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-                    <img className="w-8 h-8 mr-2" src="public/soict.png" alt="logo"/> HUST
+                    <img className="w-8 h-8 mr-2" src="../../../public/soict.png" alt="logo"/> HUST
                 </Link>
                 <div
                     className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
@@ -122,22 +149,23 @@ const Login = () => {
                                 <div className="flex items-center">
                                     <input
                                         type="checkbox"
-                                        name="rememberMe"
-                                        id="rememberMe"
-                                        checked={formData.rememberMe}
+                                        name="remember"
+                                        id="remember"
+                                        checked={formData.remember}
                                         onChange={(e) => setFormData({
                                             ...formData,
-                                            rememberMe: e.target.checked
+                                            remember: e.target.checked
                                         })}
                                         className="text-primary-600 border-gray-300 rounded focus:ring-primary-600 dark:focus:ring-blue-500"
                                     />
-                                    <label htmlFor="rememberMe"
+                                    <label htmlFor="remember"
                                            className="ml-2 text-sm text-gray-900 dark:text-white">
                                         Remember me
                                     </label>
                                 </div>
+                                {errors.remember && <span className="text-red-500">{errors.remember}</span>}
                             </div>
-                            {numberOfLoginAttempts >= 3 && (
+                            {numberOfLoginAttempts >= 5 && (
                                 <ReCAPTCHA
                                     ref={recaptchaRef}
                                     className="mt-3"
@@ -150,28 +178,28 @@ const Login = () => {
                             )}
                             {errorMessage && <p className="text-red-500">{errorMessage}</p>}
                             <button type="submit"
-                            className="w-full text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-                            Sign in
-                        </button>
-                        <div className="flex justify-between">
-                            <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                                <Link to="/forgot-password" className="font-medium text-primary-600 hover:underline dark:text-primary-500">
-                                    Forgot password?
-                                </Link>
-                            </p>
-                            <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                                Don't have an account yet?{" "}
-                                <Link to="/signup" className="font-medium text-primary-600 hover:underline dark:text-primary-500">
-                                    Sign up
-                                </Link>
-                            </p>
-                        </div>
-                    </form>
+                                    className="w-full text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                                Sign in
+                            </button>
+                            <div className="flex justify-between">
+                                <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+                                    <Link to="/forgot-password" className="font-medium text-primary-600 hover:underline dark:text-primary-500">
+                                        Forgot password?
+                                    </Link>
+                                </p>
+                                <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+                                    {"Don't have an account yet? "}
+                                    <Link to="/signup" className="font-medium text-primary-600 hover:underline dark:text-primary-500">
+                                        Sign up
+                                    </Link>
+                                </p>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
-);
+        </section>
+    );
 }
 
 export default Login;
