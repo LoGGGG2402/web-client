@@ -16,10 +16,16 @@ const Login = () => {
     });
     const recaptchaRef = useRef(null);
     const [errors, setErrors] = useState({});
+
     const [errorMessage, setErrorMessage] = useState("");
+
     const [numberOfLoginAttempts, setNumberOfLoginAttempts] = useState(0);
-    // const [isRecaptchaError, setIsRecaptchaError] = useState(false);
+
+    const [isRecaptchaError, setIsRecaptchaError] = useState(false);
+
     const [loading, setLoading] = useState(false);
+    
+    const [isverified, setIsVerified] = useState(false);    
 
     const validateForm = () => {
         let errors = {};
@@ -35,50 +41,48 @@ const Login = () => {
             isValid = false;
         }
 
-        if (numberOfLoginAttempts >= 3 && !formData.recaptcha) {
-            errors.recaptcha = "Please verify you are human";
+        if (numberOfLoginAttempts >= 3 && !isverified) {
+            setIsRecaptchaError(true);
             isValid = false;
-        }
+        } 
 
-        return { isValid, errors };
+        setErrors(errors);
+        return isValid;
     };
 
     const handleRecaptchaChange = (value) => {
-        setFormData({ ...formData, recaptcha: value });
-        console.log(formData)
-        // setIsRecaptchaError(false);
+        setFormData({...formData, recaptcha: value});
+        setIsVerified(true);
+        console.log(formData);
+        setIsRecaptchaError(false);
+        setLoading(false)
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
+        setLoading(true)
 
-        const { isValid, errors } = validateForm();
-        setErrors(errors);
-
-        if (!isValid) {
-            if (numberOfLoginAttempts >= 3) {
-                recaptchaRef.current.reset();
-                // setIsRecaptchaError(true);
-            }
-            setLoading(false);
+        if (!validateForm()) {
+            setLoading(false)
             return;
         }
 
         try {
             const response = await axios.post("auth/login", formData, { withCredentials: true });
             if (response.status === 200) {
-                setLoading(false);
+                setLoading(false)
                 dispatch(login(response.data));
                 navigate("/");
             }
         } catch (error) {
+            setErrorMessage(error.response.data.message);
+            setLoading(false)
             if (error.response.data.attempts) {
                 setNumberOfLoginAttempts(parseInt(error.response.data.attempts));
+                console.log(numberOfLoginAttempts)
             }
-            if (numberOfLoginAttempts >= 3) {
-                recaptchaRef.current.reset();
-            }
+            recaptchaRef.current.reset();
+            setIsVerified(false);
             if (error.response.status === 403) {
                 Swal.fire({
                     title: "Account is not activated",
@@ -102,10 +106,7 @@ const Login = () => {
                     }
                 });
             }
-            setLoading(false);
-            setErrorMessage(error.response ? error.response.data.message : "An error occurred");
-        } finally {
-            setLoading(false); // Ensure loading is set to false in all cases
+        
         }
     };
 
@@ -175,18 +176,14 @@ const Login = () => {
                                 {errors.remember && <span className="text-red-500">{errors.remember}</span>}
                             </div>
                             {numberOfLoginAttempts >= 3 && (
-                                <>
-                                    <ReCAPTCHA
-                                        ref={recaptchaRef}
-                                        className="mt-3"
-                                        sitekey="6Ldl-tspAAAAAMFgU-aOT5gkzMZIr0LfFXzgASzK"
-                                        onChange={handleRecaptchaChange}
-                                    />
-                                    {errors.recaptcha && <span className="text-red-500">{errors.recaptcha}</span>}
-                                </>
-
+                                <ReCAPTCHA
+                                    ref={recaptchaRef}
+                                    className="mt-3"
+                                    sitekey="6Ldl-tspAAAAAMFgU-aOT5gkzMZIr0LfFXzgASzK"
+                                    onChange={handleRecaptchaChange}
+                                />
                             )}
-                            {/*{isRecaptchaError && <p className="text-red-500">Please verify you are human</p>}*/}
+                            {isRecaptchaError && <p className="text-red-500">Please verify you are human</p>}
                             {errorMessage && <p className="text-red-500">{errorMessage}</p>}
                             {loading ?
                                 <button

@@ -78,6 +78,9 @@ axios.interceptors.response.use(
         return response;
     },
     async (error) => {
+        if (error.response.status === 429) {
+            alert(error.response.data.message)
+        }
         if (error.response.status === 409){
             const originalRequest = error.config;
             if (error.response && error.response.status === 401 && !originalRequest._retry) {
