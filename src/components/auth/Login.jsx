@@ -16,8 +16,11 @@ const Login = () => {
     });
     const recaptchaRef = useRef(null);
     const [errors, setErrors] = useState({});
+
     const [errorMessage, setErrorMessage] = useState("");
+
     const [numberOfLoginAttempts, setNumberOfLoginAttempts] = useState(0);
+
     const [isRecaptchaError, setIsRecaptchaError] = useState(false);
 
     const [loading, setLoading] = useState(false);
@@ -33,6 +36,11 @@ const Login = () => {
 
         if (!formData.password) {
             errors.password = "Password is required";
+            isValid = false;
+        }
+
+        if (numberOfLoginAttempts >= 3 && !formData.recaptcha) {
+            setIsRecaptchaError(true);
             isValid = false;
         }
 
@@ -61,16 +69,16 @@ const Login = () => {
         try {
             const response = await axios.post("auth/login", formData, { withCredentials: true });
             if (response.status === 200) {
+                setLoading(false)
                 dispatch(login(response.data));
                 navigate("/");
             }
         } catch (error) {
             if (error.response.data.attempts) {
                 setNumberOfLoginAttempts(parseInt(error.response.data.attempts));
-            } else {
-                setNumberOfLoginAttempts(numberOfLoginAttempts + 1);
+                console.log(numberOfLoginAttempts)
             }
-            if (numberOfLoginAttempts + 1 >=3) {
+            if (numberOfLoginAttempts >= 3) {
                 recaptchaRef.current.reset();
             }
             if (error.response.status === 403) {
@@ -97,9 +105,9 @@ const Login = () => {
                 });
             }
             console.error("Error:", error);
+            setLoading(false)
             setErrorMessage(error.response.data.message);
         }
-        setLoading(false)
     };
 
     return (
@@ -175,18 +183,17 @@ const Login = () => {
                                     onChange={handleRecaptchaChange}
                                 />
                             )}
-                            {isRecaptchaError && (
-                                <p className="text-red-500">Please verify you are human</p>
-                            )}
+                            {isRecaptchaError && <p className="text-red-500">Please verify you are human</p>}
                             {errorMessage && <p className="text-red-500">{errorMessage}</p>}
                             {loading ?
                                 <button
-                                                  className="w-full text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                                    className="w-full text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
                                     Loading...
                                 </button>
                                 :
-                                <button type="submit"
-                                     className="w-full text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                                <button
+                                    type="submit"
+                                    className="w-full text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
                                     Sign in
                                 </button>}
                             <div className="flex justify-between">
