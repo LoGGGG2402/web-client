@@ -83,7 +83,7 @@ axios.interceptors.response.use(
         }
         if (error.response.status === 409){
             const originalRequest = error.config;
-            if (error.response && error.response.status === 401 && !originalRequest._retry) {
+            if (error.response && !originalRequest._retry) {
                 originalRequest._retry = true;
                 await refreshAccessToken()
                 return axios(originalRequest);
