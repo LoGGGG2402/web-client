@@ -16,13 +16,9 @@ const Login = () => {
     });
     const recaptchaRef = useRef(null);
     const [errors, setErrors] = useState({});
-
     const [errorMessage, setErrorMessage] = useState("");
-
     const [numberOfLoginAttempts, setNumberOfLoginAttempts] = useState(0);
-
-    const [isRecaptchaError, setIsRecaptchaError] = useState(false);
-
+    // const [isRecaptchaError, setIsRecaptchaError] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const validateForm = () => {
@@ -40,43 +36,45 @@ const Login = () => {
         }
 
         if (numberOfLoginAttempts >= 3 && !formData.recaptcha) {
-            setIsRecaptchaError(true);
+            errors.recaptcha = "Please verify you are human";
             isValid = false;
         }
 
-        setErrors(errors);
-        return isValid;
+        return { isValid, errors };
     };
 
     const handleRecaptchaChange = (value) => {
-        setFormData({...formData, recaptcha: value})
-        setIsRecaptchaError(false);
+        setFormData({ ...formData, recaptcha: value });
+        console.log(formData)
+        // setIsRecaptchaError(false);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true)
+        setLoading(true);
 
-        if (!validateForm()) {
-            return;
-        }
+        const { isValid, errors } = validateForm();
+        setErrors(errors);
 
-        if (numberOfLoginAttempts >= 3) {
-            setIsRecaptchaError(true);
+        if (!isValid) {
+            if (numberOfLoginAttempts >= 3) {
+                recaptchaRef.current.reset();
+                // setIsRecaptchaError(true);
+            }
+            setLoading(false);
             return;
         }
 
         try {
             const response = await axios.post("auth/login", formData, { withCredentials: true });
             if (response.status === 200) {
-                setLoading(false)
+                setLoading(false);
                 dispatch(login(response.data));
                 navigate("/");
             }
         } catch (error) {
             if (error.response.data.attempts) {
                 setNumberOfLoginAttempts(parseInt(error.response.data.attempts));
-                console.log(numberOfLoginAttempts)
             }
             if (numberOfLoginAttempts >= 3) {
                 recaptchaRef.current.reset();
@@ -104,9 +102,10 @@ const Login = () => {
                     }
                 });
             }
-            console.error("Error:", error);
-            setLoading(false)
-            setErrorMessage(error.response.data.message);
+            setLoading(false);
+            setErrorMessage(error.response ? error.response.data.message : "An error occurred");
+        } finally {
+            setLoading(false); // Ensure loading is set to false in all cases
         }
     };
 
@@ -176,14 +175,18 @@ const Login = () => {
                                 {errors.remember && <span className="text-red-500">{errors.remember}</span>}
                             </div>
                             {numberOfLoginAttempts >= 3 && (
-                                <ReCAPTCHA
-                                    ref={recaptchaRef}
-                                    className="mt-3"
-                                    sitekey="6Ldl-tspAAAAAMFgU-aOT5gkzMZIr0LfFXzgASzK"
-                                    onChange={handleRecaptchaChange}
-                                />
+                                <>
+                                    <ReCAPTCHA
+                                        ref={recaptchaRef}
+                                        className="mt-3"
+                                        sitekey="6Ldl-tspAAAAAMFgU-aOT5gkzMZIr0LfFXzgASzK"
+                                        onChange={handleRecaptchaChange}
+                                    />
+                                    {errors.recaptcha && <span className="text-red-500">{errors.recaptcha}</span>}
+                                </>
+
                             )}
-                            {isRecaptchaError && <p className="text-red-500">Please verify you are human</p>}
+                            {/*{isRecaptchaError && <p className="text-red-500">Please verify you are human</p>}*/}
                             {errorMessage && <p className="text-red-500">{errorMessage}</p>}
                             {loading ?
                                 <button

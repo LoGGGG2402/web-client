@@ -9,7 +9,7 @@ import { Provider } from 'react-redux';
 import Cookies from 'js-cookie';
 
 // Set default Axios configuration
-axios.defaults.baseURL = 'https://libapp-22c8e613e2c2.herokuapp.com/api/v2/';
+axios.defaults.baseURL = '/api/v2/';
 // axios.defaults.withCredentials = true;
 
 // Function to refresh access token
@@ -78,20 +78,13 @@ axios.interceptors.response.use(
         return response;
     },
     async (error) => {
-        if (error.response.status === 429){
-            alert(error.response.data.message);
-            return Promise.reject(error);
-        }
-        const originalRequest = error.config;
-        if (error.response && error.response.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true;
-            // const newAccessToken = await refreshAccessToken();
-            await refreshAccessToken()
-            // if (newAccessToken) {
-            //     axios.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
-            // axios.defaults.headers.common['csrf-token'] = Cookies.get('csrfToken');
-            return axios(originalRequest);
-            // }
+        if (error.response.status === 409){
+            const originalRequest = error.config;
+            if (error.response && error.response.status === 401 && !originalRequest._retry) {
+                originalRequest._retry = true;
+                await refreshAccessToken()
+                return axios(originalRequest);
+            }
         }
         return Promise.reject(error);
     }
