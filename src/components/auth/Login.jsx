@@ -24,8 +24,8 @@ const Login = () => {
     const [isRecaptchaError, setIsRecaptchaError] = useState(false);
 
     const [loading, setLoading] = useState(false);
-
-    const [isverified, setIsVerified] = useState(false);
+    
+    const [isverified, setIsVerified] = useState(false);    
 
     const validateForm = () => {
         let errors = {};
@@ -44,7 +44,7 @@ const Login = () => {
         if (numberOfLoginAttempts >= 3 && !isverified) {
             setIsRecaptchaError(true);
             isValid = false;
-        }
+        } 
 
         setErrors(errors);
         return isValid;
@@ -75,13 +75,16 @@ const Login = () => {
                 navigate("/");
             }
         } catch (error) {
+            setErrorMessage(error.response.data.message);
             setLoading(false)
             if (error.response.data.attempts) {
                 setNumberOfLoginAttempts(parseInt(error.response.data.attempts));
                 console.log(numberOfLoginAttempts)
             }
-            recaptchaRef.current.reset();
-            setIsVerified(false);
+            if(isverified){
+                recaptchaRef.current.reset();
+                setIsVerified(false);
+            }
             if (error.response.status === 403) {
                 Swal.fire({
                     title: "Account is not activated",
@@ -105,8 +108,7 @@ const Login = () => {
                     }
                 });
             }
-            console.error("Error:", error);
-            setErrorMessage(error.response.data.message);
+        
         }
     };
 

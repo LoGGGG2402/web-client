@@ -1,7 +1,7 @@
 import NavBar from "./components/NavBar.jsx";
 import UsersTable from "./components/admin/UsersTable.jsx";
 import BooksTable from "./components/user/BooksTable.jsx";
-
+import "./App.css";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./components/auth/Login.jsx";
 import Signup from "./components/auth/Signup.jsx";

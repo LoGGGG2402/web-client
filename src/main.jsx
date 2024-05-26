@@ -10,7 +10,7 @@ import Cookies from 'js-cookie';
 
 // Set default Axios configuration
 axios.defaults.baseURL = '/api/v2/';
-// axios.defaults.withCredentials = true;
+axios.defaults.withCredentials = true;
 
 // Function to refresh access token
 const refreshAccessToken = async () => {
