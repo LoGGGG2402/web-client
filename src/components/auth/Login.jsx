@@ -20,6 +20,8 @@ const Login = () => {
     const [numberOfLoginAttempts, setNumberOfLoginAttempts] = useState(0);
     const [isRecaptchaError, setIsRecaptchaError] = useState(false);
 
+    const [loading, setLoading] = useState(false);
+
     const validateForm = () => {
         let errors = {};
         let isValid = true;
@@ -45,12 +47,13 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true)
 
         if (!validateForm()) {
             return;
         }
 
-        if (numberOfLoginAttempts >= 5) {
+        if (numberOfLoginAttempts >= 3) {
             setIsRecaptchaError(true);
             return;
         }
@@ -59,8 +62,6 @@ const Login = () => {
             const response = await axios.post("auth/login", formData, { withCredentials: true });
             if (response.status === 200) {
                 dispatch(login(response.data));
-                // let expirationTime = Date.now() + 15 * 60 * 1000;
-                // localStorage.setItem("expirationTime", expirationTime.toString());
                 navigate("/");
             }
         } catch (error) {
@@ -69,7 +70,7 @@ const Login = () => {
             } else {
                 setNumberOfLoginAttempts(numberOfLoginAttempts + 1);
             }
-            if (numberOfLoginAttempts + 1 >= 5) {
+            if (numberOfLoginAttempts + 1 >=3) {
                 recaptchaRef.current.reset();
             }
             if (error.response.status === 403) {
@@ -98,6 +99,7 @@ const Login = () => {
             console.error("Error:", error);
             setErrorMessage(error.response.data.message);
         }
+        setLoading(false)
     };
 
     return (
@@ -105,7 +107,7 @@ const Login = () => {
             <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-0">
                 <Link to="/"
                       className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-                    <img className="w-8 h-8 mr-2" src="../../../public/soict.png" alt="logo"/> HUST
+                    <img className="w-8 h-8 mr-2" src="/public/vite.svg" alt="logo"/> HUST
                 </Link>
                 <div
                     className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
@@ -165,7 +167,7 @@ const Login = () => {
                                 </div>
                                 {errors.remember && <span className="text-red-500">{errors.remember}</span>}
                             </div>
-                            {numberOfLoginAttempts >= 5 && (
+                            {numberOfLoginAttempts >= 3 && (
                                 <ReCAPTCHA
                                     ref={recaptchaRef}
                                     className="mt-3"
@@ -177,10 +179,16 @@ const Login = () => {
                                 <p className="text-red-500">Please verify you are human</p>
                             )}
                             {errorMessage && <p className="text-red-500">{errorMessage}</p>}
-                            <button type="submit"
-                                    className="w-full text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-                                Sign in
-                            </button>
+                            {loading ?
+                                <button
+                                                  className="w-full text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                                    Loading...
+                                </button>
+                                :
+                                <button type="submit"
+                                     className="w-full text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                                    Sign in
+                                </button>}
                             <div className="flex justify-between">
                                 <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                                     <Link to="/forgot-password" className="font-medium text-primary-600 hover:underline dark:text-primary-500">

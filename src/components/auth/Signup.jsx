@@ -16,6 +16,7 @@ const SignUp = () => {
 
     const [errors, setErrors] = useState({});
     const [errorMessage, setErrorMessage] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const validateForm = () => {
         let errors = {};
@@ -57,9 +58,11 @@ const SignUp = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
         // Validate form data
         if (!validateForm()) {
+            setLoading(false)
             return;
         }
 
@@ -82,13 +85,15 @@ const SignUp = () => {
                 text: 'Something went wrong! error: ' + error,
             }).then()
         }
+        setLoading(false);
+
     };
 
     return (
             <section className="bg-gray-50 dark:bg-gray-900 pt-0">
                 <div className="flex flex-col items-center content-center mx-auto ">
                     <Link to={"/"} className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-                        <img className="w-8 h-8 mr-2" src="/soict.png" alt="logo"/> HUST
+                        <img className="w-8 h-8 mr-2" src="/public/vite.svg" alt="logo"/> HUST
                     </Link>
                     <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
                         <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
@@ -190,10 +195,16 @@ const SignUp = () => {
                                 </div>
                                 {errorMessage && <p className="text-red-500">{errorMessage}</p>}
                                 {/* Sign-up button */}
-                                <button type="submit"
-                                        className="w-full text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Create
-                                    an account
-                                </button>
+                                { loading ?
+                                    <button
+                                            className="w-full text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                                        Creating account...
+                                    </button>
+                                    :
+                                    <button type="submit"
+                                             className="w-full text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                                        Create an account
+                                    </button>}
                 
                                 <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                                     Already have an account?{" "}

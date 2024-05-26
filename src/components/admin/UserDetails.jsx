@@ -23,7 +23,9 @@ const UserDetails = () => {
     status: 'active', // Default status to 'active'
     avatar: '',
     date_of_birth: '',
-    gender: ''
+    gender: '',
+    join_date: '',
+    last_login: ''
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -182,6 +184,14 @@ const UserDetails = () => {
             <div className="w-full sm:w-1/2 px-2 mb-4">
               <label className="block text-gray-700">Gender:</label>
               <p className="px-3 py-2 border rounded-md">{userData.gender ? userData.gender : 'Not specified'}</p>
+            </div>
+            <div className="w-full sm:w-1/2 px-2 mb-4">
+              <label className="block text-gray-700">Join Date:</label>
+              <p className="px-3 py-2 border rounded-md">{userData.join_date}</p>
+            </div>
+            <div className="w-full sm:w-1/2 px-2 mb-4">
+              <label className="block text-gray-700">Last Login:</label>
+              <p className="px-3 py-2 border rounded-md">{userData.last_login ? userData.last_login : 'Not specified'}</p>
             </div>
           </div>
         )}
